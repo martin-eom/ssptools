@@ -3,7 +3,7 @@
 ## Preamble
 
 This package contains classes and scripts developed by the author for his work in solid state physics, mainly for working with the input and output
-of the Vienna Ab initio Simulation Package. These tools are very specific in their use. The primary purpose of having them on the PyPI is to enable
+of the Vienna Ab initio Simulation Package. These tools are very specific in their use. The primary purpose of having them on GitHub and the PyPI is to enable
 easier editing of scripts while working on multiple devices. However you may still find some scipts to be of use to you.
 
 ## Scripts
