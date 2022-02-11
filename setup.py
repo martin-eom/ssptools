@@ -5,7 +5,8 @@ with open("README.md", 'r', encoding="utf-8") as fh:
 
 setuptools.setup(
 	name="ssptools",
-	version="0.1.0",
+	version="0.2.0",
+	url="https://github.com/martin-eom/ssptools",
 	author="Martin Keller",
 	description="Various specialized tools for working with the input and output of VASP",
         long_description=long_description,
