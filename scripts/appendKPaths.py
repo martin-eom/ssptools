@@ -16,4 +16,4 @@ lines[1] = " %d\n"%nk_new
 with open(sys.argv[2], 'w') as file:
     for line in lines:
         file.write(line)
-
+print("%d kpoints were appended to %s."%(nk_new-nk_old, sys.argv[2]))
