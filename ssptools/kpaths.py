@@ -45,6 +45,5 @@ def makeCoordList(pointList, numList, nameList):
         prev, current = array(pointList[i-1]), array(pointList[i])
         diffStep = (current - prev) / numList[i]
         for j in range(1, numList[i] + 1):
-            print(j)
             coordList.append(prev + diffStep * j)
     return coordList
