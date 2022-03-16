@@ -1,11 +1,12 @@
 import sys, json
 from numpy import array
 from numpy.linalg import norm
-from pymatgen.io.vasp.outputs import Vasprun
+from ssptools.io.main import getBands, getKpoints, getKweights, get_system
+from ssptools.eigenvalues import alignment, weighted_kpoint_inds
 import matplotlib.pyplot as plt
 
 class BSData:
-    def __init__(self, *argv):
+    def __init__(self, *argv, **kwargs):
         # loading from BSData-shaped json
         if len(argv) == 1:
             with open(argv[0], 'r') as file:
@@ -22,18 +23,27 @@ class BSData:
             data, JSON = argv[0], argv[1]
             self.x_data = [0.]
             self.xticks = []
-            if "SYSTEM" in data["input"]["incar"].keys():
-                self.name = data["input"]["incar"]["SYSTEM"]
-            else: self.name = "unknown_system"
+            self.name = get_system(data)
             numlist, self.labels = [straight["npoints"] for straight in JSON["straights"]], [straight["name"] for straight in JSON["straights"]]
             nk = sum(numlist)
             self.rec_vec = array(data["input"]["lattice_rec"]["matrix"])
-            self.kpoints = [kp[0]*self.rec_vec[0] + kp[1]*self.rec_vec[1] + kp[2]*self.rec_vec[2] for kp in data["input"]["kpoints"]["kpoints"]]
+            self.kpoints = [kp[0]*self.rec_vec[0] + kp[1]*self.rec_vec[1] + kp[2]*self.rec_vec[2] for kp in getKpoints(data)]
             last = self.kpoints[-nk]
             for kpoint in self.kpoints[-nk+1:]:
                 self.x_data.append(self.x_data[-1] + norm(kpoint-last))
                 last = kpoint
-            self.bands = [[ev[i][0] - 5 for ev in data["output"]["eigenvalues"]['1'][-nk:]] for i in range(len(data["output"]["eigenvalues"]['1'][0]))]
+            bands = getBands(data)
+            if "auto_align" in kwargs and kwargs["auto_align"] == True:
+                weighted_ind, weighted_bands = weighted_kpoint_inds(bands, getKweights(data))
+                div = 2
+                if "6H" in self.name:   E0 = alignment(weighted_bands, scheme = "bzavg", nvb = 24 // div, ncb = 12 // div)
+                elif "4H" in self.name: E0 = alignment(weighted_bands, scheme = "bzavg", nvb = 16 // div, ncb = 8 // div)
+                elif "2H" in self.name: E0 = alignment(weighted_bands, scheme = "bzavg", nvb = 8 // div,  ncb = 4 // div)
+                elif "3C" in self.name: E0 = alignment(weighted_bands, scheme = "bzavg", nvb = 12 // div, ncb = 6 // div)
+                else: E0 = alignment(bands, **kwargs)
+            else:
+                E0 = alignment(bands, **kwargs)
+            self.bands = [[ev[i][0] - E0 for ev in bands[-nk:]] for i in range(len(bands[0]))]
             for i in range(len(numlist)):
                 self.xticks.append(self.x_data[sum(numlist[:i+1]) - 1])
         # giving all attributes manually
