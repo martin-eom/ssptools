@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-import sys, json
+import sys
 from ssptools.kpaths import read, makeCoordList
 
 pointList, numList, nameList = read(sys.argv[1])
