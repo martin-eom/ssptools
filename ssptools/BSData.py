@@ -35,7 +35,10 @@ class BSData:
             bands = getBands(data)
             if "auto_align" in kwargs and kwargs["auto_align"] == True:
                 weighted_ind, weighted_bands = weighted_kpoint_inds(bands, getKweights(data))
-                div = 2
+                if "LSORBIT" in data['input']['incar'].keys() and data['input']['incar']['LSORBIT'] == True:
+                    div = 1
+                else:
+                    div = 2
                 if "6H" in self.name:   E0 = alignment(weighted_bands, scheme = "bzavg", nvb = 24 // div, ncb = 12 // div)
                 elif "4H" in self.name: E0 = alignment(weighted_bands, scheme = "bzavg", nvb = 16 // div, ncb = 8 // div)
                 elif "2H" in self.name: E0 = alignment(weighted_bands, scheme = "bzavg", nvb = 8 // div,  ncb = 4 // div)
