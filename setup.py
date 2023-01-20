@@ -30,6 +30,7 @@ setuptools.setup(
             "scripts/2POS.py",
             "scripts/appendKPaths.py",
             "scripts/compareEV.py",
-            "scripts/plotBS.py"
+            "scripts/plotBS.py",
+	    "scripts/sortPOS.py"
         ]
 )
