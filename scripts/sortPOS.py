@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 from ase.io.vasp import read_vasp, write_vasp
 import sys
 
