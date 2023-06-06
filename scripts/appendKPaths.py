@@ -3,8 +3,9 @@
 import sys
 from ssptools.kpaths import read, makeCoordList
 
-pointList, numList, nameList = read(sys.argv[1])
-coordList = makeCoordList(pointList, numList, nameList)
+pointList, numList, nameList, rest = read(sys.argv[1])
+coordList = makeCoordList(pointList, numList, nameList, rest)
+
 with open(sys.argv[2], 'a') as file:
     for kpoint in coordList:
         file.write("\t%f\t%f\t%f\t%d\n" % (kpoint[0], kpoint[1], kpoint[2], 0))

@@ -1,5 +1,6 @@
 import sys, json
-from numpy import array
+from numpy import array, column_stack, dot
+from numpy.linalg import inv
 
 exampleJSON = " {\n\
   \"type\": \"reciprocal\",\n\
@@ -24,13 +25,18 @@ def read(filename):
             pointList   = [straight["endpoint"] for straight in data["straights"]]
             numList     = [straight["npoints"] for straight in data["straights"]]
             nameList    = [straight["name"] for straight in data["straights"]]
-            return pointList, numList, nameList
+            rest = {}
+            if "reciprocal vectors" in data:
+                oldRecVectors  = [array(vec) for vec in data["reciprocal vectors"]["old"]]
+                newRecVectors  = [array(vec) for vec in data["reciprocal vectors"]["new"]]
+                rest["reciprocal vectors"] = {"old" : oldRecVectors, "new" : newRecVectors}
+            return pointList, numList, nameList, rest
         except:
             print("Example of json file:\n%s"%exampleJSON)
             raise
         
 
-def makeCoordList(pointList, numList, nameList):
+def makeCoordList(pointList, numList, nameList, rest):
     try:
         if not (len(pointList)==len(numList) and len(numList)==len(nameList)):
             raise IndexError("Supplied lists must have the same lengths.")
@@ -46,4 +52,15 @@ def makeCoordList(pointList, numList, nameList):
         diffStep = (current - prev) / numList[i]
         for j in range(1, numList[i] + 1):
             coordList.append(prev + diffStep * j)
+    # if you set the lattice vectors of your supercell in a lazy and stupid way you can use kpoints along different lattice vectors
+    if "reciprocal vectors" in rest:
+        ov = [array(vec) for vec in rest["reciprocal vectors"]["old"]]
+        nv = [array(vec) for vec in rest["reciprocal vectors"]["new"]]
+        # transform to carthesian coordinates using new reciprocal vectors
+        for c, coord in enumerate(coordList):
+            coordList[c] = sum(nv[i]*coord[i] for i in range(3))
+        # transform back to fractional coordinates of old reciprocal vectors
+        invOV = inv(column_stack(ov))
+        for c, coord in enumerate(coordList):
+            coordList[c] = dot(invOV, coord)
     return coordList
