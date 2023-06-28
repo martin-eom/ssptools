@@ -33,7 +33,9 @@ class BSData:
                 self.x_data.append(self.x_data[-1] + norm(kpoint-last))
                 last = kpoint
             bands = getBands(data)
-            if "auto_align" in kwargs and kwargs["auto_align"] == True:
+            if "alignment" in kwargs:
+                E0 = kwargs["alignment"]
+            elif "auto_align" in kwargs and kwargs["auto_align"] == True:
                 weighted_ind, weighted_bands = weighted_kpoint_inds(bands, getKweights(data))
                 if "LSORBIT" in data['input']['incar'].keys() and data['input']['incar']['LSORBIT'] == True:
                     div = 1

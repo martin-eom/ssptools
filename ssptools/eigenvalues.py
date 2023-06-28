@@ -21,7 +21,9 @@ def seperateBands(kpoint):
     return c_bands, v_bands
 
 def alignment(bands, **kwargs):
-    if "scheme" in kwargs.keys() and kwargs["scheme"] == "bzavg":   # eigenvalues should only inclued weighted kpoints
+    if "noalign" in kwargs.keys() and kwargs["noalign"] == True:
+        return 0
+    elif "scheme" in kwargs.keys() and kwargs["scheme"] == "bzavg":   # eigenvalues should only inclued weighted kpoints
         if "nvb" in kwargs.keys():
             nvb = kwargs["nvb"]
         else:
